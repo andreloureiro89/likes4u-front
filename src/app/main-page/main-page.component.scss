@@ -1,0 +1,99 @@
+.container-fluid {
+  text-align: center;
+  margin-top: 8rem; // posição em ecrãs grandes
+
+  h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    color: #555;
+  }
+}
+
+// Ajuste para ecrãs pequenos
+@media (max-width: 768px) {
+  .container-fluid {
+    margin-top: 4rem;
+    h2 {
+      font-size: 1.8rem;
+    }
+    h3 {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Ajuste para ecrãs muito pequenos (ex: telemóveis antigos)
+@media (max-width: 480px) {
+  .container-fluid {
+    margin-top: 2rem;
+    h2 {
+      font-size: 1.6rem;
+    }
+    h3 {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// botão
+.cta-button {
+  padding: 0.75rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: darken(#0d6efd, 5%);
+    transform: translateY(-2px);
+  }
+}
+
+// Selecção da plataforma
+@media (max-width: 768px) {
+  .cta-button {
+    font-size: 1rem;
+    padding: 0.6rem 1.5rem;
+  }
+}
+
+.platform-card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 16px 10px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  cursor: pointer;
+
+  img {
+    width: 28px; height: 28px;
+    filter: grayscale(20%);
+  }
+  span { font-weight: 600; font-size: .95rem; }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    border-color: #cfe2ff;
+  }
+  &.active {
+    border-color: #0d6efd;
+    box-shadow: 0 8px 24px rgba(13,110,253,.15);
+  }
+}
+
+.trust {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  background: #fff;
+}
+.trust-emoji { font-size: 1.4rem; }
+.trust-title { font-weight: 700; margin-top: .35rem; }
+.trust-sub   { color: #6c757d; font-size: .95rem; }

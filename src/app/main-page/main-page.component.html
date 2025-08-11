@@ -1,0 +1,131 @@
+<div class="container-fluid text-center py-5">
+  <h1 class="main-title">
+    Aumenta a tua presença online em segundos 🚀✨
+  </h1>
+  <h3 class="main-subtitle mt-3">
+    Ganha mais Likes, Views ou Comentários nas tuas publicações de Instagram, TikTok, Facebook ou YouTube.
+  </h3>
+    <button class="btn btn-primary btn-lg mt-4 cta-button">
+    Começar Agora
+  </button>
+</div>
+<!-- Seleção da plataforma -->
+<div class="container-fluid my-5">
+  <h4 class="text-center mb-4">Escolhe a plataforma</h4>
+
+  <div class="row g-3 justify-content-center">
+    <div class="col-6 col-sm-3 col-md-2">
+      <button class="platform-card w-100" (click)="selectPlatform('instagram')">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+        <span>Instagram</span>
+      </button>
+    </div>
+    <div class="col-6 col-sm-3 col-md-2">
+      <button class="platform-card w-100" (click)="selectPlatform('tiktok')">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok">
+        <span>TikTok</span>
+      </button>
+    </div>
+    <div class="col-6 col-sm-3 col-md-2">
+      <button class="platform-card w-100" (click)="selectPlatform('facebook')">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
+        <span>Facebook</span>
+      </button>
+    </div>
+    <div class="col-6 col-sm-3 col-md-2">
+      <button class="platform-card w-100" (click)="selectPlatform('youtube')">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
+        <span>YouTube</span>
+      </button>
+    </div>
+  </div>
+
+  <p class="text-center mt-2 text-muted" *ngIf="platform != null">
+    Plataforma selecionada: <strong class="text-capitalize">{{ platform }}</strong>
+  </p>
+
+  <!-- Formulário -->
+<div class="container my-4" id="order-form">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Detalhes do pedido</h5>
+
+      <form (ngSubmit)="submit()" #f="ngForm">
+        <div class="row g-3">
+          <!-- Link -->
+          <div class="col-12">
+            <label class="form-label">Link da publicação</label>
+            <input type="url" class="form-control" name="link" [(ngModel)]="form.link"
+                   placeholder="Cole aqui o link da publicação" required>
+            <div class="form-text">Aceitamos links de {{ platform || 'Instagram, TikTok, Facebook ou YouTube' }}.</div>
+          </div>
+
+          <!-- Tipo de serviço -->
+          <div class="col-12 col-md-6">
+            <label class="form-label">Serviço</label>
+            <select class="form-select" name="service" [(ngModel)]="form.service" required>
+              <option value="" disabled selected>Escolha...</option>
+              <option value="likes">Likes</option>
+              <option value="views">Views</option>
+              <option value="comments">Comentários</option>
+            </select>
+          </div>
+
+          <!-- Quantidade -->
+          <div class="col-12 col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Quantidade</span>
+              <strong>{{ form.quantity | number }}</strong>
+            </label>
+            <input type="range" class="form-range" min="50" max="10000" step="50"
+                   [(ngModel)]="form.quantity" name="quantity">
+            <div class="d-flex justify-content-between small text-muted">
+              <span>50</span><span>10 000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-primary btn-lg" [disabled]="!f.valid">Continuar</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="reset()">Limpar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Secção final confiança -->
+<div class="container my-5">
+  <div class="row text-center g-3">
+    <div class="col-6 col-md-3">
+      <div class="trust p-3">
+        <div class="trust-emoji">⚡️</div>
+        <div class="trust-title">Entrega rápida</div>
+        <div class="trust-sub">Processamento automático</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="trust p-3">
+        <div class="trust-emoji">🔒</div>
+        <div class="trust-title">Pagamento seguro</div>
+        <div class="trust-sub">MB Way / Multibanco</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="trust p-3">
+        <div class="trust-emoji">⭐</div>
+        <div class="trust-title">Clientes satisfeitos</div>
+        <div class="trust-sub">Recomendações reais</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="trust p-3">
+        <div class="trust-emoji">💬</div>
+        <div class="trust-title">Suporte</div>
+        <div class="trust-sub">Por e-mail 7/7</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
