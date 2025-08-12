@@ -67,7 +67,8 @@
               "buildTarget": "like4u:build:production"
             },
             "development": {
-              "buildTarget": "like4u:build:development"
+              "buildTarget": "like4u:build:development",
+              "proxyConfig": "proxy.conf.json" 
             }
           },
           "defaultConfiguration": "development"

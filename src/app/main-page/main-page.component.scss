@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .container-fluid {
   text-align: center;
   margin-top: 8rem; // posição em ecrãs grandes
@@ -48,7 +50,7 @@
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: darken(#0d6efd, 5%);
+    background-color: color.adjust(#0d6efd, $lightness: -5%);
     transform: translateY(-2px);
   }
 }
@@ -97,3 +99,25 @@
 .trust-emoji { font-size: 1.4rem; }
 .trust-title { font-weight: 700; margin-top: .35rem; }
 .trust-sub   { color: #6c757d; font-size: .95rem; }
+
+
+// LOADINGS DOTS TIMING
+.spinner-grow {
+  animation: spinner-grow 0.75s linear infinite;
+}
+
+.spinner-grow:nth-child(1) {
+  animation-delay: 0s;
+}
+.spinner-grow:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.spinner-grow:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.spinner-grow:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.spinner-grow:nth-child(5) {
+  animation-delay: 0.4s;
+}

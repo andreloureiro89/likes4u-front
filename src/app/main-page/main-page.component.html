@@ -5,9 +5,6 @@
   <h3 class="main-subtitle mt-3">
     Ganha mais Likes, Views ou Comentários nas tuas publicações de Instagram, TikTok, Facebook ou YouTube.
   </h3>
-    <button class="btn btn-primary btn-lg mt-4 cta-button">
-    Começar Agora
-  </button>
 </div>
 <!-- Seleção da plataforma -->
 <div class="container-fluid my-5">
@@ -15,25 +12,25 @@
 
   <div class="row g-3 justify-content-center">
     <div class="col-6 col-sm-3 col-md-2">
-      <button class="platform-card w-100" (click)="selectPlatform('instagram')">
+      <button id="instagram" class="platform-card w-100" (click)="selectPlatform('instagram')">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
         <span>Instagram</span>
       </button>
     </div>
     <div class="col-6 col-sm-3 col-md-2">
-      <button class="platform-card w-100" (click)="selectPlatform('tiktok')">
+      <button id="tiktok" class="platform-card w-100" (click)="selectPlatform('tiktok')">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok">
         <span>TikTok</span>
       </button>
     </div>
     <div class="col-6 col-sm-3 col-md-2">
-      <button class="platform-card w-100" (click)="selectPlatform('facebook')">
+      <button id="facebook" class="platform-card w-100" (click)="selectPlatform('facebook')">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
         <span>Facebook</span>
       </button>
     </div>
     <div class="col-6 col-sm-3 col-md-2">
-      <button class="platform-card w-100" (click)="selectPlatform('youtube')">
+      <button id="youtube" class="platform-card w-100" (click)="selectPlatform('youtube')">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
         <span>YouTube</span>
       </button>
@@ -53,11 +50,18 @@
       <form (ngSubmit)="submit()" #f="ngForm">
         <div class="row g-3">
           <!-- Link -->
-          <div class="col-12">
+          <div class="col-12" *ngIf="!loadingDots">
             <label class="form-label">Link da publicação</label>
             <input type="url" class="form-control" name="link" [(ngModel)]="form.link"
-                   placeholder="Cole aqui o link da publicação" required>
-            <div class="form-text">Aceitamos links de {{ platform || 'Instagram, TikTok, Facebook ou YouTube' }}.</div>
+                   placeholder="Cole aqui o link da publicação" (input)="onLinkChange($event)" required>
+            <div class="form-text">Links de {{ platform || 'Instagram, TikTok, Facebook ou YouTube' }}.</div>
+          </div>
+          <div class="col-12" *ngIf="loadingDots">
+              <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
+              <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
+              <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
+              <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
+              <div class="spinner-grow text-warning" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
           </div>
 
           <!-- Tipo de serviço -->
