@@ -1,6 +1,6 @@
 <div class="container-fluid text-center py-5">
   <h1 class="main-title">
-    Aumenta a tua presença online em segundos 🚀✨
+    Aumenta a tua presença online em minutos 🚀✨
   </h1>
   <h3 class="main-subtitle mt-3">
     Ganha mais Likes, Views ou Comentários nas tuas publicações de Instagram, TikTok, Facebook ou YouTube.
@@ -53,8 +53,9 @@
           <div class="col-12" *ngIf="!loadingDots">
             <label class="form-label">Link da publicação</label>
             <input type="url" class="form-control" name="link" [(ngModel)]="form.link"
-                   placeholder="Cole aqui o link da publicação" (input)="onLinkChange($event)" required>
-            <div class="form-text">Links de {{ platform || 'Instagram, TikTok, Facebook ou YouTube' }}.</div>
+                   placeholder="Cole aqui o link da publicação" (input)="onLinkChange($event)" [class.input-error]="invalideUrl" required>
+            <div *ngIf="!invalideUrl" class="form-text">Links de {{ platform || 'Instagram, TikTok, Facebook ou YouTube' }}.</div>
+            <div *ngIf="invalideUrl" class="form-text errorLink">Links inválido.</div>
           </div>
           <div class="col-12" *ngIf="loadingDots">
               <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>

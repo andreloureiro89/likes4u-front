@@ -21,6 +21,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private linkInput$ = new Subject<string>();
   loadingDots = false;
+  invalideUrl = false;
 
   constructor(
     private verifyService: VerifyUrlService
@@ -34,6 +35,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(url => {
+        this.invalideUrl = false;
+        if (!url || url.trim() === '') {
+          this.loadingDots = false;
+          return;
+        }
+
         this.loadingDots = true;
 
         setTimeout(() => {
@@ -44,6 +51,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
                     this.loadingDots = false;
                     if (res.valid) {
                       this.selectPlatform(res.platform);
+                    } else {
+                      this.form.service = '';
+                      this.invalideUrl = true;
+                      this.selectPlatform('');
                     }
                   },
                   error: (err) => {

@@ -121,3 +121,13 @@
 .spinner-grow:nth-child(5) {
   animation-delay: 0.4s;
 }
+
+.input-error {
+  border-color: red;
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+.errorLink {
+  font-style: oblique;
+  color: red;
+}
