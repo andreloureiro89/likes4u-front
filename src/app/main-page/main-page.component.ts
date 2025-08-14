@@ -3,6 +3,7 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VerifyUrlService } from '../services/verify-url.service';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { JapService } from '../services/jap.service';
 
 @Component({
   selector: 'app-main-page',
@@ -24,7 +25,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
   invalideUrl = false;
 
   constructor(
-    private verifyService: VerifyUrlService
+    private verifyService: VerifyUrlService,
+    private japServices: JapService
   ) { }
 
   ngOnInit() {
@@ -101,8 +103,9 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   submit() {
     if (!this.form.link || !this.form.service) return;
-    console.table({ platform: this.platform, ...this.form });
-    alert('Perfeito! Vamos continuar para o pagamento em breve.');
+
+    this.japServices.getServices().subscribe(res => console.log(res));
+    
   }
 
   onLinkChange(event: Event) {
