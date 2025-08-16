@@ -21,6 +21,61 @@ export class MainPageComponent implements OnInit, OnDestroy {
   form = { link: '', service: '', quantity: 500 };
   private destroy$ = new Subject<void>();
   private linkInput$ = new Subject<string>();
+  servicesList: any = [{
+    name: null,
+    value: null
+  }];
+  instagramServices = [
+    {
+      name: "Likes",
+      value: "likes"
+    },
+    {
+      name: "Followers",
+      value: "followers"
+    },
+    {
+      name: "Comments",
+      value: "comments"
+    },
+    {
+      name: "Views Reels",
+      value: "viewReels"
+    },
+    {
+      name: "Views Stories",
+      value: "viewStories"
+    }
+  ];
+  tiktokServices = [{
+    name: "Views",
+    value: "views"
+  }];
+  facebookServices = [
+    {
+      name: "Likes",
+      value: "likes"
+    },
+    {
+      name: "Likes & Followers",
+      value: "likesFollowers"
+    }
+  ];
+  youtubeServices = [
+    {
+      name: "Views",
+      value: "views"
+    },
+    {
+      name: "Views e Likes",
+      value: "viewLikes"
+    },
+    {
+      name: "Views, Like e Comentários",
+      value: "viewsLikeComments"
+    }
+  ];
+
   loadingDots = false;
   invalideUrl = false;
 
@@ -57,6 +112,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
                       this.form.service = '';
                       this.invalideUrl = true;
                       this.selectPlatform('');
+                      this.servicesList = [];
                     }
                   },
                   error: (err) => {
@@ -80,6 +136,16 @@ export class MainPageComponent implements OnInit, OnDestroy {
   selectPlatform(p: any) {
     this.platform = p;
     const ids = ['instagram', 'tiktok', 'facebook', 'youtube'];
+
+    if (p === 'instagram') {
+      this.servicesList = this.instagramServices;
+    } else if (p === 'tiktok'){
+      this.servicesList = this.tiktokServices;
+    } else if (p === 'facebook') {
+      this.servicesList = this.facebookServices;
+    } else {
+      this.servicesList = this.youtubeServices;
+    }
 
     ids.forEach(id => {
       const el = document.getElementById(id);

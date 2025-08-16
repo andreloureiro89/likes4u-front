@@ -70,9 +70,9 @@
             <label class="form-label">Serviço</label>
             <select class="form-select" name="service" [(ngModel)]="form.service" required>
               <option value="" disabled selected>Escolha...</option>
-              <option value="likes">Likes</option>
-              <option value="views">Views</option>
-              <option value="comments">Comentários</option>
+              <option *ngFor="let s of servicesList" [value]="s.value">
+                {{ s.name }}
+              </option>
             </select>
           </div>
 
