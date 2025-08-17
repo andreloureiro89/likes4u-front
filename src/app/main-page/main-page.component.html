@@ -42,95 +42,118 @@
   </p>
 
   <!-- Formulário -->
-<div class="container my-4" id="order-form">
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <h5 class="card-title mb-3">Detalhes do pedido</h5>
+  <div class="container my-4" id="order-form">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Detalhes do pedido</h5>
 
-      <form (ngSubmit)="submit()" #f="ngForm">
-        <div class="row g-3">
-          <!-- Link -->
-          <div class="col-12" *ngIf="!loadingDots">
-            <label class="form-label">Link da publicação</label>
-            <input type="url" class="form-control" name="link" [(ngModel)]="form.link"
-                   placeholder="Cole aqui o link da publicação" (input)="onLinkChange($event)" [class.input-error]="invalideUrl" required>
-            <div *ngIf="!invalideUrl" class="form-text">Links de {{ platform || 'Instagram, TikTok, Facebook ou YouTube' }}.</div>
-            <div *ngIf="invalideUrl" class="form-text errorLink">Links inválido.</div>
-          </div>
-          <div class="col-12" *ngIf="loadingDots">
+        <form (ngSubmit)="submit()" #f="ngForm">
+          <div class="row g-3">
+            <!-- Link -->
+            <div class="col-12" *ngIf="!loadingDots">
+              <label class="form-label">Link da publicação</label>
+              <input type="url" class="form-control" name="link" [(ngModel)]="form.link"
+                placeholder="Cole aqui o link da publicação" (input)="onLinkChange($event)"
+                [class.input-error]="invalideUrl" required>
+              <div *ngIf="!invalideUrl" class="form-text">Links de {{ platform || 'Instagram, TikTok, Facebook ou
+                YouTube' }}.</div>
+              <div *ngIf="invalideUrl" class="form-text errorLink">Links inválido.</div>
+            </div>
+            <div class="col-12" *ngIf="loadingDots">
               <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
               <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
               <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
               <div class="spinner-grow text-warning me-2" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
               <div class="spinner-grow text-warning" style="width: 1.5rem; height: 1.5rem;" role="status"></div>
-          </div>
-
-          <!-- Tipo de serviço -->
-          <div class="col-12 col-md-6">
-            <label class="form-label">Serviço</label>
-            <select class="form-select" name="service" [(ngModel)]="form.service" required>
-              <option value="" disabled selected>Escolha...</option>
-              <option *ngFor="let s of servicesList" [value]="s.value">
-                {{ s.name }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Quantidade -->
-          <div class="col-12 col-md-6">
-            <label class="form-label d-flex justify-content-between">
-              <span>Quantidade</span>
-              <strong>{{ form.quantity | number }}</strong>
-            </label>
-            <input type="range" class="form-range" min="50" max="10000" step="50"
-                   [(ngModel)]="form.quantity" name="quantity">
-            <div class="d-flex justify-content-between small text-muted">
-              <span>50</span><span>10 000</span>
             </div>
+
+            <!-- Tipo de serviço -->
+            <div class="col-12 col-md-6">
+              <select class="form-select" (change)="onServiceChange($event)" name="service" [(ngModel)]="form.service"
+                required>
+                <option value="" disabled selected>Escolha o Serviço...</option>
+                <option *ngFor="let s of servicesList" [value]="s.value">
+                  {{ s.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Categoria de serviço -->
+            <div class="col-12 col-md-6">
+              <select class="form-select" name="categoria" [(ngModel)]="form.categoria"
+                (ngModelChange)="onCategoryChange()" required>
+                <option value="" disabled>Escolha a Categoria...</option>
+                <option *ngFor="let c of categoryList" [value]="c.value">{{ c.name }}</option>
+              </select>
+            </div>
+
+            <!-- Quantidade -->
+            <div class="col-12">
+              
+              <input type="range" class="form-range col-12" [min]="getMinQuantity()" [max]="getMaxQuantity()"
+                [step]="getStepQuantity()" [(ngModel)]="form.quantity" name="quantity"
+                (ngModelChange)="onQuantityChange($event)" />
+            </div>
+
+            <!-- valores dinâmicos nas extremidades -->
+            <div class="d-flex justify-content-between small text-muted">
+              <span>{{ getMinQuantity() }}</span>
+              <span>{{ getMaxQuantity() }}</span>
+            </div>
+            
+            <!-- Inputs dinâmicos -->
+            <div class="col-12" *ngIf="isCustomComments554()">
+              <div *ngFor="let c of comments; let i = index" class="input-group mb-2">
+                <input type="text" class="form-control" [placeholder]="'Comentário número ' + (i + 1)"
+                  [(ngModel)]="comments[i]" name="comment{{ i }}" />
+              </div>
+              <small class="text-muted">Mínimo 2 e máximo 20 comentários (step 2).</small>
+            </div>
+
+
           </div>
-        </div>
 
-        <div class="d-flex gap-2 mt-4">
-          <button class="btn btn-primary btn-lg" [disabled]="!f.valid">Continuar</button>
-          <button type="button" class="btn btn-outline-secondary" (click)="reset()">Limpar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Secção final confiança -->
-<div class="container my-5">
-  <div class="row text-center g-3">
-    <div class="col-6 col-md-3">
-      <div class="trust p-3">
-        <div class="trust-emoji">⚡️</div>
-        <div class="trust-title">Entrega rápida</div>
-        <div class="trust-sub">Processamento automático</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="trust p-3">
-        <div class="trust-emoji">🔒</div>
-        <div class="trust-title">Pagamento seguro</div>
-        <div class="trust-sub">MB Way / Multibanco</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="trust p-3">
-        <div class="trust-emoji">⭐</div>
-        <div class="trust-title">Clientes satisfeitos</div>
-        <div class="trust-sub">Recomendações reais</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="trust p-3">
-        <div class="trust-emoji">💬</div>
-        <div class="trust-title">Suporte</div>
-        <div class="trust-sub">Por e-mail 7/7</div>
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary btn-lg" [disabled]="!f.valid">Continuar</button>
+            <button type="button" class="btn btn-outline-secondary" (click)="reset()">Limpar</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Secção final confiança -->
+  <div class="container my-5">
+    <div class="row text-center g-3">
+      <div class="col-6 col-md-3">
+        <div class="trust p-3">
+          <div class="trust-emoji">⚡️</div>
+          <div class="trust-title">Entrega rápida</div>
+          <div class="trust-sub">Processamento automático</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="trust p-3">
+          <div class="trust-emoji">🔒</div>
+          <div class="trust-title">Pagamento seguro</div>
+          <div class="trust-sub">MB Way / Multibanco</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="trust p-3">
+          <div class="trust-emoji">⭐</div>
+          <div class="trust-title">Clientes satisfeitos</div>
+          <div class="trust-sub">Recomendações reais</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="trust p-3">
+          <div class="trust-emoji">💬</div>
+          <div class="trust-title">Suporte</div>
+          <div class="trust-sub">Por e-mail 7/7</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
