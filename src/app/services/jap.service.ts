@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Order } from '../model/models/order';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JapService {
 
-  private apiUrl = '/api/jap'; // URL do teu back-end
+  private apiUrl = '/api/jap';
+  orderList: Order[] = [];
 
   constructor(private http: HttpClient) { }
 
@@ -54,6 +56,21 @@ export class JapService {
   ordersStatus(orders: number[]) {
     // o backend pode aceitar array ou string "1,2,3"; aqui envio array
     return this.http.post(`${this.apiUrl}/orders-status`, { orders });
+  }
+
+  // estado da encomenda
+  getOrderList() {
+    return this.orderList;
+  }
+
+  // adicionar serviço a lista
+  addServiceOrderList(order:Order) {
+    this.orderList.push(order);
+  }
+
+  // remover serviço da lista
+  removeServiceOrderList(order: Order) {
+    this.orderList = this.orderList.filter(o => o.id !== order.id);
   }
 
 }

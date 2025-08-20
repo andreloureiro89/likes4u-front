@@ -6,31 +6,51 @@
     Ganha mais Likes, Views ou Comentários nas tuas publicações de Instagram, TikTok, Facebook ou YouTube.
   </h3>
 </div>
+
+<!-- Aviso -->
+<div class="container text-center">
+  <div class="alert alert-warning d-inline-block px-3 py-2">
+    🔓 Atenção: a tua conta e publicações devem estar 
+    <u>públicas e visíveis para todos</u>, caso contrário o pedido não será processado.
+  </div>
+</div>
+
+<!-- Passo-a-passo -->
+<div class="container text-center mb-4">
+  <ul class="list-unstyled steps-text">
+    <li>1️⃣ Cola o <strong>link</strong> da publicação, reel, storie, vídeo ou perfil.</li>
+    <li>2️⃣ Escolhe o <strong>serviço</strong> (Likes, Views ou Comentários).</li>
+    <li>3️⃣ Seleciona a <strong>categoria</strong> (Económico, Standard ou Premium).</li>
+    <li>4️⃣ Define a <strong>quantidade</strong> através do slider.</li>
+    <li>5️⃣ Clica em <strong>Adicionar ao carrinho</strong> e finaliza o pagamento.</li>
+  </ul>
+</div>
+
+
 <!-- Seleção da plataforma -->
 <div class="container-fluid my-5">
-  <h4 class="text-center mb-4">Escolhe a plataforma</h4>
 
   <div class="row g-3 justify-content-center">
     <div class="col-6 col-sm-3 col-md-2">
-      <button id="instagram" class="platform-card w-100" (click)="selectPlatform('instagram')">
+      <button id="instagram" class="platform-card w-100">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
         <span>Instagram</span>
       </button>
     </div>
     <div class="col-6 col-sm-3 col-md-2">
-      <button id="tiktok" class="platform-card w-100" (click)="selectPlatform('tiktok')">
+      <button id="tiktok" class="platform-card w-100">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok">
         <span>TikTok</span>
       </button>
     </div>
     <div class="col-6 col-sm-3 col-md-2">
-      <button id="facebook" class="platform-card w-100" (click)="selectPlatform('facebook')">
+      <button id="facebook" class="platform-card w-100">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
         <span>Facebook</span>
       </button>
     </div>
     <div class="col-6 col-sm-3 col-md-2">
-      <button id="youtube" class="platform-card w-100" (click)="selectPlatform('youtube')">
+      <button id="youtube" class="platform-card w-100">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
         <span>YouTube</span>
       </button>
@@ -53,7 +73,7 @@
             <div class="col-12" *ngIf="!loadingDots">
               <label class="form-label">Link da publicação</label>
               <input type="url" class="form-control" name="link" [(ngModel)]="form.link"
-                placeholder="Cole aqui o link da publicação" (input)="onLinkChange($event)"
+                placeholder="Cole aqui o link" (input)="onLinkChange($event)"
                 [class.input-error]="invalideUrl" required>
               <div *ngIf="!invalideUrl" class="form-text">Links de {{ platform || 'Instagram, TikTok, Facebook ou
                 YouTube' }}.</div>
@@ -98,14 +118,20 @@
             <!-- valores dinâmicos nas extremidades -->
             <div class="d-flex justify-content-between small text-muted">
               <span>{{ getMinQuantity() }}</span>
+              <span class="fw-bold">{{ form.quantity }}</span>
               <span>{{ getMaxQuantity() }}</span>
             </div>
             
-            <!-- Inputs dinâmicos -->
-            <div class="col-12" *ngIf="isCustomComments554()">
-              <div *ngFor="let c of comments; let i = index" class="input-group mb-2">
-                <input type="text" class="form-control" [placeholder]="'Comentário número ' + (i + 1)"
-                  [(ngModel)]="comments[i]" name="comment{{ i }}" />
+            <!-- Inputs dinâmicos | Mostrar inputs apenas quando for a categoria 554 -->
+            <div class="col-12" *ngIf="showCommentsInputs">
+              <div *ngFor="let c of comments; let i = index; trackBy: trackByIndex" class="input-group mb-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'Comentário número ' + (i + 1)"
+                  [(ngModel)]="comments[i]"
+                  name="comment{{ i }}"
+                  [ngModelOptions]="{standalone: true}" />
               </div>
               <small class="text-muted">Mínimo 2 e máximo 20 comentários (step 2).</small>
             </div>
@@ -114,7 +140,9 @@
           </div>
 
           <div class="d-flex gap-2 mt-4">
-            <button class="btn btn-primary btn-lg" [disabled]="!f.valid">Continuar</button>
+            <button class="btn btn-primary btn-lg" [disabled]="!f.valid">
+              <i class="bi bi-cart-plus"> Carrinho</i>
+            </button>
             <button type="button" class="btn btn-outline-secondary" (click)="reset()">Limpar</button>
           </div>
         </form>

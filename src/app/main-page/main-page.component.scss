@@ -19,9 +19,11 @@
 @media (max-width: 768px) {
   .container-fluid {
     margin-top: 4rem;
+
     h2 {
       font-size: 1.8rem;
     }
+
     h3 {
       font-size: 1rem;
     }
@@ -32,9 +34,11 @@
 @media (max-width: 480px) {
   .container-fluid {
     margin-top: 2rem;
+
     h2 {
       font-size: 1.6rem;
     }
+
     h3 {
       font-size: 0.9rem;
     }
@@ -75,33 +79,63 @@
   cursor: pointer;
 
   img {
-    width: 28px; height: 28px;
+    width: 28px;
+    height: 28px;
     filter: grayscale(20%);
   }
-  span { font-weight: 600; font-size: .95rem; }
+
+  span {
+    font-weight: 600;
+    font-size: .95rem;
+  }
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .06);
     border-color: #cfe2ff;
   }
+
   &.active {
     border-color: #0d6efd;
-    box-shadow: 0 8px 24px rgba(13,110,253,.15);
+    box-shadow: 0 8px 24px rgba(13, 110, 253, .15);
   }
 }
 
 .trust {
+  flex: 1;
+  text-align: center;
   border: 1px solid #e9ecef;
   border-radius: 14px;
   background: #fff;
+  padding: 1rem;
+  height: 100%;
 }
-.trust-emoji { font-size: 1.4rem; }
-.trust-title { font-weight: 700; margin-top: .35rem; }
-.trust-sub   { color: #6c757d; font-size: .95rem; }
 
+.row.text-center.g-3 {
+  display: flex;
+  flex-wrap: wrap;
+}
 
-// LOADINGS DOTS TIMING
+.row.text-center.g-3 > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
+
+.trust-emoji {
+  font-size: 1.4rem;
+}
+
+.trust-title {
+  font-weight: 700;
+  margin-top: .35rem;
+}
+
+.trust-sub {
+  color: #6c757d;
+  font-size: .95rem;
+}
+
 .spinner-grow {
   animation: spinner-grow 0.75s linear infinite;
 }
@@ -109,15 +143,19 @@
 .spinner-grow:nth-child(1) {
   animation-delay: 0s;
 }
+
 .spinner-grow:nth-child(2) {
   animation-delay: 0.1s;
 }
+
 .spinner-grow:nth-child(3) {
   animation-delay: 0.2s;
 }
+
 .spinner-grow:nth-child(4) {
   animation-delay: 0.3s;
 }
+
 .spinner-grow:nth-child(5) {
   animation-delay: 0.4s;
 }
@@ -130,4 +168,9 @@
 .errorLink {
   font-style: oblique;
   color: red;
+}
+
+.steps-text li {
+  margin-bottom: 8px;
+  font-size: 1rem;
 }

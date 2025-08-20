@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { VerifyUrlService } from '../services/verify-url.service';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { JapService } from '../services/jap.service';
+import { v4 as uuidv4 } from 'uuid';
+import { Order } from '../model/models/order';
 
 @Component({
   selector: 'app-main-page',
@@ -11,18 +13,26 @@ import { JapService } from '../services/jap.service';
   imports: [
     CommonModule,
     FormsModule
-],
+  ],
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.scss']
 })
 export class MainPageComponent implements OnInit, OnDestroy {
   platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | null = null;
 
-  form = { link: '', service: '', categoria: '', quantity: 500 };
+  form = { link: '', service: '', categoria: '', quantity: 500, comments: [] };
   private destroy$ = new Subject<void>();
   private linkInput$ = new Subject<string>();
   comments: string[] = [];
-  
+  isInstaProfile = false;
+  isInstaReels = false;
+  isInstaStorie = false;
+  showCommentsInputs = false;
+  loadingDots = false;
+  invalideUrl = false;
+
+  trackByIndex = (_: number, __: unknown) => _;
+
   servicesList: any = [{
     name: null,
     value: null
@@ -31,26 +41,32 @@ export class MainPageComponent implements OnInit, OnDestroy {
     name: null,
     value: null
   }];
+  instagramFollowersServices = [
+    {
+      name: "Followers",
+      value: "followers"
+    }
+  ];
+  instagramReelsServices = [
+    {
+      name: "Views Reels",
+      value: "viewReels"
+    }
+  ];
+  instagramStoreisServices = [
+    {
+      name: "Views Stories",
+      value: "viewStories"
+    }
+  ];
   instagramServices = [
     {
       name: "Likes",
       value: "likes"
     },
     {
-      name: "Followers",
-      value: "followers"
-    },
-    {
       name: "Comments",
       value: "comments"
-    },
-    {
-      name: "Views Reels",
-      value: "viewReels"
-    },
-    {
-      name: "Views Stories",
-      value: "viewStories"
     }
   ];
   tiktokServices = [{
@@ -107,11 +123,11 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ];
   instagramCommentsCategoryList = [
     {
-      name: "ECONOMICO - Comentários EMOJIS, reposição 30 dias",
+      name: "ECONOMICO - Comentários aleatórios com EMOJIS, reposição 30 dias",
       value: "668"
     },
     {
-      name: "STANDART - Comentário EMOJIS de contas naturais, reposição 30 dias",
+      name: "STANDART - Comentário aleatórios com EMOJIS de contas naturais, reposição 30 dias",
       value: "1171"
     },
     {
@@ -190,13 +206,9 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
   ];
 
-
-  loadingDots = false;
-  invalideUrl = false;
-
   constructor(
     private verifyService: VerifyUrlService,
-    private japServices: JapService
+    private japService: JapService
   ) { }
 
   ngOnInit() {
@@ -214,14 +226,19 @@ export class MainPageComponent implements OnInit, OnDestroy {
         }
 
         this.loadingDots = true;
+        this.isInstaProfile = false;
+        this.isInstaReels = false;
+        this.isInstaStorie = false;
 
         setTimeout(() => {
           if (url) {
             this.verifyService.checkUrl(url).subscribe({
               next: (res) => {
-                console.log('Validação:', res);
                 this.loadingDots = false;
                 if (res.valid) {
+                  this.isInstaProfile = this.isInstagramProfileLink(url);
+                  this.isInstaReels = this.isInstagramReel(url);
+                  this.isInstaStorie = this.isInstagramStory(url);
                   this.selectPlatform(res.platform);
                 } else {
                   this.form.service = '';
@@ -253,8 +270,14 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.platform = p;
     const ids = ['instagram', 'tiktok', 'facebook', 'youtube'];
 
-    if (p === 'instagram') {
+    if (p === 'instagram' && !this.isInstaProfile && !this.isInstaReels && !this.isInstaStorie) {
       this.servicesList = this.instagramServices;
+    } else if (p === 'instagram' && this.isInstaProfile) {
+      this.servicesList = this.instagramFollowersServices;
+    } else if(p === 'instagram' && this.isInstaReels){
+      this.servicesList = this.instagramReelsServices;
+    } else if(p === 'instagram' && this.isInstaStorie) {
+      this.servicesList = this.instagramStoreisServices;
     } else if (p === 'tiktok') {
       this.servicesList = this.tiktokServices;
     } else if (p === 'facebook') {
@@ -279,27 +302,34 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   reset() {
-    this.form = { link: '', service: '', categoria: '', quantity: 500 };
+    this.form = { link: '', service: '', categoria: '', quantity: 500, comments: [] };
     this.platform = null;
   }
 
   submit() {
     if (!this.form.link || !this.form.service) return;
 
-    const payload: any = { ...this.form };
-
+    let cleanedComments: string[] | undefined;
     if (this.isCustomComments554()) {
-      const cleaned = this.comments.map(c => c.trim()).filter(Boolean);
-      if (cleaned.length !== this.form.quantity) {
+      cleanedComments = (this.comments ?? []).map(c => c.trim()).filter(Boolean);
+      if (cleanedComments.length !== this.form.quantity) {
         alert(`Precisas de preencher ${this.form.quantity} comentários.`);
         return;
       }
-      payload.comments = cleaned;
     }
 
-    // exemplo de chamada
-    console.log('PAYLOAD:', payload);
-    this.japServices.getServices().subscribe(res => console.log(res));
+    const payload: Order = {
+      id: uuidv4(),
+      categoria: this.form.categoria,
+      comments: cleanedComments,
+      link: this.form.link,
+      quantity: this.form.quantity,
+      service: this.form.service,
+    };
+
+    this.japService.addServiceOrderList(payload);
+    console.log("PAYLOAD ADDED:", payload);
+    console.log("ORDER LIST:", this.japService.getOrderList());
   }
 
   ensureCommentsArray() {
@@ -316,9 +346,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   onServiceChange(event: any) {
-    console.log("Rede Social escolhida: ", this.platform);
-    console.log("Serviço selecionado:", this.form.service);
-    console.log("Evento (value):", event.target.value);
 
     if (this.isCustomComments554()) {
       this.onQuantityChange(this.form.quantity);
@@ -345,7 +372,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
     } else {
       this.categoryList = this.youtubeCategoryList;
     }
+
     this.ensureCommentsArray();
+    this.showCommentsInputs = this.isCustomComments554();
+    this.onQuantityChange(this.form.quantity);
   }
 
   isCustomComments554(): boolean {
@@ -366,26 +396,59 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   onQuantityChange(n: number) {
     if (this.isCustomComments554()) {
-      this.resizeComments(n);
+      const min = 2, max = 20, step = 2;
+      const clamped = Math.min(max, Math.max(min, Math.round(n / step) * step));
+      if (clamped !== this.form.quantity) this.form.quantity = clamped;
+      this.resizeComments(this.form.quantity);
     } else {
-      this.comments = [];
+      this.resizeComments(this.form.quantity);
     }
   }
 
   private resizeComments(n: number) {
-    // aplica as regras: min 2, max 20, step 2
-    const min = 2, max = 20, step = 2;
-    let qty = Math.max(min, Math.min(max, n));
-    if (qty % step !== 0) qty = qty - (qty % step);
-    // mantém o que já foi escrito quando aumenta/diminui
-    const next: string[] = new Array(qty).fill('');
-    for (let i = 0; i < qty; i++) next[i] = this.comments[i] ?? '';
+    const prev = this.comments ?? [];
+    const next = Array.from({ length: n }, (_, i) => prev[i] ?? '');
     this.comments = next;
-    this.form.quantity = qty;
   }
 
   onCategoryChange() {
     this.ensureCommentsArray();
+    this.showCommentsInputs = this.isCustomComments554();
+    this.onQuantityChange(this.form.quantity);
+  }
+
+  isInstagramProfileLink(link: string): boolean {
+    try {
+      const url = new URL(link);
+      const host = url.hostname.replace(/^www\./, '');
+
+      if (!host.endsWith('instagram.com')) return false;
+
+      const path = url.pathname.replace(/\/+$/, '');
+      const segs = path.split('/').filter(Boolean);
+
+      const notProfiles = [
+        'p', 'reel', 'tv', 'stories', 'explore', 'accounts', 'about',
+        'developer', 'directory', 'legal', 'privacy', 'terms', 'help',
+        'web', 'challenge', 'graphql', 'api', 'ads'
+      ];
+
+      return segs.length === 1 && !notProfiles.includes(segs[0]);
+    } catch {
+      return false;
+    }
+  }
+
+  isInstagramReel(url: string): boolean {
+    if (!url) return false;
+    const regex = /^https?:\/\/(www\.)?instagram\.com\/reel\//;
+    return regex.test(url);
+  }
+
+  isInstagramStory(url: string): boolean {
+    if (!url) return false;
+    const regex = /^https?:\/\/(www\.)?instagram\.com\/stories\//;
+    return regex.test(url);
   }
 
 
