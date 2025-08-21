@@ -304,6 +304,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   reset() {
     this.form = { link: '', service: '', categoria: '', quantity: 500, comments: [] };
     this.platform = null;
+    this.showCommentsInputs = false;
   }
 
   submit() {

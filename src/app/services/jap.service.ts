@@ -74,6 +74,21 @@ export class JapService {
     this.saveToStorage();
   }
 
+  // editar um pedido
+  updateServiceOrderList(updated: Order): void {
+
+    this.getOrderList();
+
+    const idx = this.orderList.findIndex(o => o.id === updated.id);
+    if (idx === -1) return; // nada a fazer se não existir
+
+    // substitui o item
+    this.orderList[idx] = { ...this.orderList[idx], ...updated };
+
+    // persiste
+    localStorage.setItem('likes4uOrderList', JSON.stringify(this.orderList));
+  }
+
   // remove serviço da lista e ao LocalStorage
   removeServiceOrderList(order: Order): void {
     this.orderList = this.orderList.filter(o => o.id !== order.id);
@@ -90,4 +105,5 @@ export class JapService {
   private saveToStorage(): void {
     localStorage.setItem(this.storageKey, JSON.stringify(this.orderList));
   }
+
 }
