@@ -1,0 +1,88 @@
+<div class="container my-5" id="checkout-cart">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title d-flex align-items-center gap-2 mb-0">
+        <i class="bi bi-cart3"></i>
+        Carrinho
+      </h5>
+    </div>
+  </div>
+
+  <!-- loading -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-grow text-warning me-2" style="width:1.5rem;height:1.5rem" role="status"></div>
+    <div class="spinner-grow text-warning me-2" style="width:1.5rem;height:1.5rem" role="status"></div>
+    <div class="spinner-grow text-warning" style="width:1.5rem;height:1.5rem" role="status"></div>
+  </div>
+
+  <!-- vazio -->
+  <div class="card shadow-sm mt-3" *ngIf="!loading && orders.length === 0">
+    <div class="card-body text-center text-muted">
+      <div class="mb-2" style="font-size:2rem">🛒</div>
+      O teu carrinho está vazio.
+      <div class="small">Adiciona serviços na pragina principal.</div>
+    </div>
+  </div>
+
+  <!-- lista -->
+  <div class="mt-3" *ngIf="!loading && orders.length > 0">
+    <div
+      class="card shadow-sm mb-3"
+      *ngFor="let o of orders; trackBy: trackById">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <div class="cart-bullet">★</div>
+            <div>
+              <div class="fw-semibold">
+                {{ serviceLabel(o.service) }}
+                <span class="badge rounded-pill bg-light text-dark border ms-2">
+                  {{ categoryLabel(o.categoria) || '—' }}
+                </span>
+              </div>
+              <div class="text-muted small mt-1">
+                <span class="me-3">Quantidade: <strong>{{ o.quantity }}</strong></span>
+                <span class="me-3" *ngIf="commentsCount(o) > 0">
+                  Comentários: <strong>{{ commentsCount(o) }}</strong>
+                </span>
+                <span class="d-block d-md-inline mt-1 mt-md-0">
+                  Link: <span class="text-break">{{ shortUrl(o.link) }}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-danger btn-sm" (click)="remove(o)" title="Remover">
+              <i class="bi bi-trash3"></i> Remover
+            </button>
+          </div>
+        </div>
+
+        <!-- comentários (se existirem) -->
+        <div *ngIf="commentsCount(o) > 0" class="mt-3">
+          <div class="small text-muted mb-1">Pré-visualização dos comentários:</div>
+          <ul class="list-unstyled small bg-light rounded p-2 mb-0"
+              style="max-height: 140px; overflow: auto;">
+            <li *ngFor="let c of o.comments">{{ c }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ações finais -->
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mt-4">
+      <div class="text-muted small">
+        Itens no carrinho: <strong>{{ orders.length }}</strong>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" (click)="refresh()">
+          <i class="bi bi-arrow-clockwise"></i> Atualizar
+        </button>
+        <button class="btn btn-primary">
+          <i class="bi bi-credit-card-fill"></i> Finalizar compra
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

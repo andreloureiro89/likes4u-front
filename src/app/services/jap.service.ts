@@ -9,9 +9,14 @@ import { Order } from '../model/models/order';
 export class JapService {
 
   private apiUrl = '/api/jap';
-  orderList: Order[] = [];
+  private storageKey = 'likes4uOrderList';
+  private orderList: Order[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    // Carrega carrinho do localStorage ao iniciar o serviço (singleton)
+    const data = localStorage.getItem(this.storageKey);
+    this.orderList = data ? JSON.parse(data) : [];
+  }
 
   getBalance(): Observable<any> {
     return this.http.get(`${this.apiUrl}/balance`);
@@ -54,23 +59,35 @@ export class JapService {
 
   // (opcional) estado de várias ordens de uma vez
   ordersStatus(orders: number[]) {
-    // o backend pode aceitar array ou string "1,2,3"; aqui envio array
     return this.http.post(`${this.apiUrl}/orders-status`, { orders });
   }
 
-  // estado da encomenda
-  getOrderList() {
+  // --------- Carrinho (localStorage) ---------
+
+  getOrderList(): Order[] {
     return this.orderList;
   }
 
-  // adicionar serviço a lista
-  addServiceOrderList(order:Order) {
+  // adiciona serviço a lista e ao LocalStorage
+  addServiceOrderList(order: Order): void {
     this.orderList.push(order);
+    this.saveToStorage();
   }
 
-  // remover serviço da lista
-  removeServiceOrderList(order: Order) {
+  // remove serviço da lista e ao LocalStorage
+  removeServiceOrderList(order: Order): void {
     this.orderList = this.orderList.filter(o => o.id !== order.id);
+    this.saveToStorage();
   }
 
+  /** Limpa completamente o carrinho (memória + localStorage) */
+  clearOrderList(): void {
+    this.orderList = [];
+    localStorage.removeItem(this.storageKey);
+  }
+
+  // Helper
+  private saveToStorage(): void {
+    localStorage.setItem(this.storageKey, JSON.stringify(this.orderList));
+  }
 }

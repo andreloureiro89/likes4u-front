@@ -328,6 +328,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     };
 
     this.japService.addServiceOrderList(payload);
+    this.reset();
     console.log("PAYLOAD ADDED:", payload);
     console.log("ORDER LIST:", this.japService.getOrderList());
   }

@@ -1,0 +1,22 @@
+@use "sass:color";
+
+#checkout-cart .card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.cart-bullet {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: .9rem;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.btn-primary:hover {
+  background-color: color.adjust(#0d6efd, $lightness: -5%);
+}
