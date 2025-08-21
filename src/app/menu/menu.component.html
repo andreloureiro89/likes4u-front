@@ -1,9 +1,16 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-    <a class="navbar-brand ms-2" href="#">Likes4U</a>
+    <a class="navbar-brand ms-2" href="/">Likes4U</a>
+
     <span class="navbar-text me-2">
-      <a class="btn btn-light" [routerLink]="['/checkout-cart']">
-        <i class="bi bi-cart" style="font-size: 30px;"></i>
+      <a class="btn btn-light" [routerLink]="['/checkout-cart']" aria-label="Carrinho">
+        <i class="bi bi-cart position-relative" style="font-size:30px;">
+          <span *ngIf="orderCount > 0"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger px-1 py-0"
+            style="font-size:1.5rem; line-height:1.1;">
+            {{ orderCount }}
+          </span>
+        </i>
       </a>
     </span>
   </div>

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Order } from '../model/models/order';
 
 @Injectable({
@@ -12,10 +12,14 @@ export class JapService {
   private storageKey = 'likes4uOrderList';
   private orderList: Order[] = [];
 
+  private cartCountSubject = new BehaviorSubject<number>(0);
+  cartCount$ = this.cartCountSubject.asObservable();
+
   constructor(private http: HttpClient) {
     // Carrega carrinho do localStorage ao iniciar o serviço (singleton)
     const data = localStorage.getItem(this.storageKey);
     this.orderList = data ? JSON.parse(data) : [];
+    this.emitCount();
   }
 
   getBalance(): Observable<any> {
@@ -72,6 +76,7 @@ export class JapService {
   addServiceOrderList(order: Order): void {
     this.orderList.push(order);
     this.saveToStorage();
+    this.emitCount();
   }
 
   // editar um pedido
@@ -87,23 +92,30 @@ export class JapService {
 
     // persiste
     localStorage.setItem('likes4uOrderList', JSON.stringify(this.orderList));
+    this.emitCount();
   }
 
   // remove serviço da lista e ao LocalStorage
   removeServiceOrderList(order: Order): void {
     this.orderList = this.orderList.filter(o => o.id !== order.id);
     this.saveToStorage();
+    this.emitCount();
   }
 
   /** Limpa completamente o carrinho (memória + localStorage) */
   clearOrderList(): void {
     this.orderList = [];
     localStorage.removeItem(this.storageKey);
+    this.emitCount();
   }
 
   // Helper
   private saveToStorage(): void {
     localStorage.setItem(this.storageKey, JSON.stringify(this.orderList));
+  }
+
+  private emitCount() {
+    this.cartCountSubject.next(this.orderList.length);
   }
 
 }
