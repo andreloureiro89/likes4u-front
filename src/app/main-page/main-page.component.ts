@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { JapService } from '../services/jap.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Order } from '../model/models/order';
+import { PricingService } from '../services/pricing.service';
 
 @Component({
   selector: 'app-main-page',
@@ -20,10 +21,11 @@ import { Order } from '../model/models/order';
 export class MainPageComponent implements OnInit, OnDestroy {
   platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | null = null;
 
-  form = { link: '', service: '', categoria: '', quantity: 500, comments: [] };
+  form = { link: '', service: '', categoria: '', quantity: 1000, comments: [] as string[], total: 0 };
   private destroy$ = new Subject<void>();
   private linkInput$ = new Subject<string>();
   comments: string[] = [];
+  commentPremium = false;
   isInstaProfile = false;
   isInstaReels = false;
   isInstaStorie = false;
@@ -95,12 +97,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ];
   instagramLikesCategoryList = [
     {
-      name: "ECONOMICO - Sem Reposição",
-      value: "8219"
+      name: "ECONOMICO- Alta Qualide, reposição 30 dias",
+      value: "1957"
     },
     {
-      name: "STANDART - Alta Qualide, reposição 30 dias",
-      value: "1957"
+      name: "STANDART - Sem Reposição",
+      value: "8219"
     },
     {
       name: "PREMIUM - Alta Qualidade, não caem",
@@ -123,12 +125,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ];
   instagramCommentsCategoryList = [
     {
-      name: "ECONOMICO - Comentários aleatórios com EMOJIS, reposição 30 dias",
-      value: "668"
+      name: "ECONOMICO - Comentário aleatórios com EMOJIS de contas naturais, reposição 30 dias",
+      value: "1171"
     },
     {
-      name: "STANDART - Comentário aleatórios com EMOJIS de contas naturais, reposição 30 dias",
-      value: "1171"
+      name: "STANDART- Comentários aleatórios com EMOJIS, reposição 30 dias",
+      value: "668"
     },
     {
       name: "PREMIUM - Comentário personalizados",
@@ -208,7 +210,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private verifyService: VerifyUrlService,
-    private japService: JapService
+    private japService: JapService,
+    private pricing: PricingService
   ) { }
 
   ngOnInit() {
@@ -302,7 +305,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   reset() {
-    this.form = { link: '', service: '', categoria: '', quantity: 500, comments: [] };
+    this.form = { link: '', service: '', categoria: '', quantity: 1000, comments: [], total: 0 };
     this.platform = null;
     this.showCommentsInputs = false;
   }
@@ -326,12 +329,11 @@ export class MainPageComponent implements OnInit, OnDestroy {
       link: this.form.link,
       quantity: this.form.quantity,
       service: this.form.service,
+      total:  this.form.total
     };
 
     this.japService.addServiceOrderList(payload);
     this.reset();
-    console.log("PAYLOAD ADDED:", payload);
-    console.log("ORDER LIST:", this.japService.getOrderList());
   }
 
   ensureCommentsArray() {
@@ -380,31 +382,53 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.onQuantityChange(this.form.quantity);
   }
 
-  isCustomComments554(): boolean {
-    return this.form.service === 'comments' && this.form.categoria === '554';
+  private isCustomComments554(): boolean {
+    return Number(this.form.categoria) === 554;
   }
 
   getMinQuantity(): number {
-    return this.isCustomComments554() ? 2 : 50;
+    return this.isCustomComments554() ? 10 : 1000;
   }
 
   getMaxQuantity(): number {
-    return this.isCustomComments554() ? 20 : 5000;
+    if (this.isCustomComments554()) {
+      this.commentPremium = true;
+      return 10;
+    } else {
+      this.commentPremium = false;
+      return 50000;
+    }
   }
 
   getStepQuantity(): number {
-    return this.isCustomComments554() ? 2 : 100;
+    if (this.isCustomComments554()) {
+      this.commentPremium = true;
+      return 10;
+    } else {
+      this.commentPremium = false;
+      return 100
+    }
   }
 
   onQuantityChange(n: number) {
+    const serviceId = Number(this.form.categoria);
+    if (!serviceId) return;
+
+    // aplica regras específicas para comentários premium (id 554)
     if (this.isCustomComments554()) {
-      const min = 2, max = 20, step = 2;
+      this.commentPremium = true;
+      const min = 10, max = 10, step = 10;
       const clamped = Math.min(max, Math.max(min, Math.round(n / step) * step));
-      if (clamped !== this.form.quantity) this.form.quantity = clamped;
+      this.form.quantity = clamped;
       this.resizeComments(this.form.quantity);
     } else {
+      this.commentPremium = false;
+      this.form.quantity = n;
       this.resizeComments(this.form.quantity);
     }
+
+    // calcula com margem e mínimo
+    this.form.total = this.pricing.calculateEUR(serviceId, this.form.quantity);
   }
 
   private resizeComments(n: number) {
@@ -452,6 +476,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     const regex = /^https?:\/\/(www\.)?instagram\.com\/stories\//;
     return regex.test(url);
   }
+
 
 
 }

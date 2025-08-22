@@ -106,18 +106,18 @@
             </div>
 
             <!-- Quantidade -->
-            <div class="col-12">
-              
+            <div *ngIf="!commentPremium" class="col-12">
               <input type="range" class="form-range col-12" [min]="getMinQuantity()" [max]="getMaxQuantity()"
                 [step]="getStepQuantity()" [(ngModel)]="form.quantity" name="quantity"
-                (ngModelChange)="onQuantityChange($event)" />
+                (ngModelChange)="onQuantityChange($event)"/>
             </div>
 
             <!-- valores dinâmicos nas extremidades -->
             <div class="d-flex justify-content-between small text-muted">
-              <span>{{ getMinQuantity() }}</span>
+              <span *ngIf="!commentPremium" >{{ getMinQuantity() }}</span>
               <span class="fw-bold">{{ form.quantity }}</span>
-              <span>{{ getMaxQuantity() }}</span>
+              <span *ngIf="!commentPremium" style="font-weight: bold;">Total: {{ this.form.total }} €</span>
+              <span *ngIf="!commentPremium" >{{ getMaxQuantity() }}</span>
             </div>
             
             <!-- Inputs dinâmicos | Mostrar inputs apenas quando for a categoria 554 -->

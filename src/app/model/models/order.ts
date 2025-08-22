@@ -4,5 +4,6 @@ export interface Order {
     comments?: string[],
     link?: string,
     quantity: number,
-    service?: string
+    service?: string,
+    total?: number,
 }
