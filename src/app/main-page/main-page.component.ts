@@ -83,25 +83,17 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ];
   youtubeServices = [
     {
-      name: "Views",
-      value: "views"
-    },
-    {
-      name: "Views e Likes",
-      value: "viewLikes"
-    },
-    {
       name: "Views, Like e Comentários",
       value: "viewsLikeComments"
     }
   ];
   instagramLikesCategoryList = [
     {
-      name: "ECONOMICO- Alta Qualide, reposição 30 dias",
+      name: "ECONOMICO- Qualidade normal, reposição 30 dias",
       value: "1957"
     },
     {
-      name: "STANDART - Sem Reposição",
+      name: "STANDART - Alta Qualide, sem Reposição",
       value: "8219"
     },
     {
@@ -153,11 +145,11 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ];
   instagramStoriesViewsCategoryList = [
     {
-      name: "ECONOMICO - Contas normais um storie",
+      name: "ECONOMICO - Contas normais",
       value: "312"
     },
     {
-      name: "STANDART - Alta Qualidade, somente o último storie",
+      name: "STANDART - Alta Qualidade",
       value: "667"
     },
     {
@@ -387,7 +379,13 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   getMinQuantity(): number {
-    return this.isCustomComments554() ? 10 : 1000;
+    if (this.isCustomComments554()) {
+      this.commentPremium = true;
+      return 10;
+    } else {
+      this.commentPremium = false;
+      return 1000;
+    }
   }
 
   getMaxQuantity(): number {
@@ -423,7 +421,9 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.resizeComments(this.form.quantity);
     } else {
       this.commentPremium = false;
-      this.form.quantity = n;
+      const min = 1000, max = 50000, step = 100;
+      const clamped = Math.min(max, Math.max(min, Math.round(n / step) * step));
+      this.form.quantity = clamped;
       this.resizeComments(this.form.quantity);
     }
 
