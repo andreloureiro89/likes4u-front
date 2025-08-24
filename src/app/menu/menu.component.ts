@@ -18,7 +18,7 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     // valor inicial (caso já exista algo no storage)
-    this.orderCount = this.japService.getOrderList().length;
+    //this.orderCount = this.japService.getOrderList().length;
 
     // atualizações reativas sempre que o service mudar a lista
     this.japService.cartCount$.subscribe(n => this.orderCount = n);

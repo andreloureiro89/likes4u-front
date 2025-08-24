@@ -38,11 +38,11 @@ export class CheckoutCartComponent implements OnInit {
       this.loading = true;
       setTimeout(() => {
         // como o service mantém um array em memória, basta ler de novo
-        this.orders = [...this.japService.getOrderList()];
+        
         this.loading = false;
       }, 2000);
     } else {
-        this.orders = [...this.japService.getOrderList()];
+        
         this.loading = false;
     }
 
@@ -95,7 +95,7 @@ export class CheckoutCartComponent implements OnInit {
       this.editModel.comments = limpos;
     }
 
-    this.japService.updateServiceOrderList(this.editModel as Order);
+    
     this.cancelarEdicao();
     this.refresh('atualizar');
   }
@@ -108,7 +108,7 @@ export class CheckoutCartComponent implements OnInit {
       cancelText: 'Cancelar'
     });
     if (!ok) return;
-    this.japService.removeServiceOrderList(order);
+   
     this.refresh('atualizar');
   }
 
@@ -151,7 +151,7 @@ export class CheckoutCartComponent implements OnInit {
   }
 
   clearOrderList() {
-    this.japService.clearOrderList();
+    //this.japService.clearOrderList();
   }
 
   private clampToStep50(n: number): number {
