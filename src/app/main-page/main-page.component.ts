@@ -25,6 +25,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private linkInput$ = new Subject<string>();
   comments: string[] = [];
+  keyOrder: string | null | undefined;
   commentPremium = false;
   isInstaProfile = false;
   isInstaReels = false;
@@ -207,8 +208,14 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.linkInput$
-      .pipe(
+
+    this.keyOrder = this.japService.getOrderKeyValue();
+    
+    if (this.keyOrder) {
+      this.japService.getCart(this.keyOrder);
+    }
+
+    this.linkInput$.pipe(
         debounceTime(1200),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
@@ -303,6 +310,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   submit() {
+
     if (!this.form.link || !this.form.service) return;
 
     let cleanedComments: string[] | undefined;
@@ -314,18 +322,25 @@ export class MainPageComponent implements OnInit, OnDestroy {
       }
     }
 
-    const payload: Order = {
-      id: uuidv4(),
-      categoria: this.form.categoria,
-      comments: cleanedComments,
-      link: this.form.link,
-      quantity: this.form.quantity,
-      service: this.form.service,
-      total:  this.form.total
-    };
+    let keyOrder = this.japService.getOrderKeyValue();
 
-    this.japService.addServiceOrderList(payload);
-    this.reset();
+    const payload: Order = {
+        id: uuidv4(),
+        categoria: this.form.categoria,
+        comments: cleanedComments,
+        link: this.form.link,
+        quantity: this.form.quantity,
+        service: this.form.service,
+        total:  this.form.total
+      };
+
+    if (keyOrder) {
+      this.japService.addItemToCart(keyOrder, payload).subscribe();
+    } else {
+      this.japService.addServiceOrderList(payload);
+      this.reset();
+    }
+
   }
 
   ensureCommentsArray() {
@@ -476,7 +491,5 @@ export class MainPageComponent implements OnInit, OnDestroy {
     const regex = /^https?:\/\/(www\.)?instagram\.com\/stories\//;
     return regex.test(url);
   }
-
-
 
 }

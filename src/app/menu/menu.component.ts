@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
 import { JapService } from '../services/jap.service';
 
 @Component({
@@ -18,7 +17,7 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     // valor inicial (caso já exista algo no storage)
-    //this.orderCount = this.japService.getOrderList().length;
+    this.orderCount = this.japService.getOrderList().length;
 
     // atualizações reativas sempre que o service mudar a lista
     this.japService.cartCount$.subscribe(n => this.orderCount = n);
