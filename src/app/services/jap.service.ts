@@ -13,6 +13,7 @@ export class JapService {
 
   private storageKey = 'likes4uOrderList';
   private orderList: Order[] = [];
+  cartId: string | null = '';
 
   private cartCountSubject = new BehaviorSubject<number>(0);
   cartCount$ = this.cartCountSubject.asObservable();
@@ -70,8 +71,8 @@ export class JapService {
   }
 
   getOrderKeyValue() {
-    const orderId = localStorage.getItem("OrderIdLikes4u");
-    return orderId;
+    this.cartId = localStorage.getItem("OrderIdLikes4u");
+    return this.cartId;
   }
 
   removeOrderKeyLocalStorage() {
@@ -93,5 +94,14 @@ export class JapService {
     );
   }
 
+  removeService(serviceId: string) {
+    this.http.delete(`/api/cart/${this.cartId}/${serviceId}`).subscribe({
+      next: (res: any) => {
+        this.orderList = res.cart.orderList;
+        this.cartCountSubject.next(this.orderList.length);
+      },
+      error: err => console.error('Erro ao remover serviço', err)
+    });
+  }
 
 }

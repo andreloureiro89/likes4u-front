@@ -23,11 +23,13 @@ export class CheckoutCartComponent implements OnInit {
   editModel: Partial<Order> = {};
   commentsText = '';
 
-  constructor(private japService: JapService) { }
+  constructor(private japService: JapService) {
+  }
 
   ngOnInit(): void {
     // busca os itens atuais do carrinho
     this.refresh('');
+
   }
 
   trackById = (_: number, o: Order) => o.id;
@@ -35,17 +37,23 @@ export class CheckoutCartComponent implements OnInit {
   refresh(from: string): void {
     if (from === "atualizar") {
       this.orders = [];
-      this.loading = true;
       setTimeout(() => {
-        // como o service mantém um array em memória, basta ler de novo
-        
+        this.orders = this.japService.getOrderList();
         this.loading = false;
       }, 2000);
     } else {
-        
-        this.loading = false;
+      this.orders = this.japService.getOrderList();
+      this.loading = false;
     }
 
+  }
+
+  get totalQuantity(): number {
+    return this.orders.reduce((sum, o) => sum + (o.quantity || 0), 0);
+  }
+
+  get totalCartValue(): number {
+    return this.orders.reduce((sum, o) => sum + (o.total || 0), 0);
   }
 
   editar(order: Order): void {
@@ -95,21 +103,28 @@ export class CheckoutCartComponent implements OnInit {
       this.editModel.comments = limpos;
     }
 
-    
+
     this.cancelarEdicao();
     this.refresh('atualizar');
   }
 
   async remove(order: Order) {
-    const ok = await this.confirm.open({
-      title: 'Remover item',
-      message: 'Queres mesmo remover este serviço do carrinho?',
-      confirmText: 'Remover',
-      cancelText: 'Cancelar'
-    });
-    if (!ok) return;
-   
-    this.refresh('atualizar');
+    console.log(order.id);
+    if (order.id) {
+      const ok = await this.confirm.open({
+        title: 'Remover item',
+        message: 'Queres mesmo remover este serviço do carrinho?',
+        confirmText: 'Remover',
+        cancelText: 'Cancelar'
+      });
+      if (!ok) {
+        return;
+      } else {
+        this.loading = true;
+        this.japService.removeService(order.id);
+        this.refresh('atualizar');
+      }
+    }
   }
 
   serviceLabel(s?: string): string {
@@ -151,7 +166,7 @@ export class CheckoutCartComponent implements OnInit {
   }
 
   clearOrderList() {
-    //this.japService.clearOrderList();
+
   }
 
   private clampToStep50(n: number): number {

@@ -35,7 +35,7 @@
                 <!-- Lado esquerdo: info -->
                 <div class="text-start">
                     <div class="small text-muted mb-1">
-                        <strong>{{ serviceLabel(o.service) }}</strong> · {{ categoryLabel(o.categoria) }}
+                        <strong>{{ serviceLabel(o.service) }}</strong> · {{ categoryLabel(o.categoria) }}  - {{ o.total | number:'1.2-2' }} €
                     </div>
 
                     <!-- modo leitura -->
@@ -123,6 +123,10 @@
         <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mt-4">
             <div class="text-muted small">
                 Itens no carrinho: <strong>{{ orders.length }}</strong>
+                (Total unidades: <strong>{{ totalQuantity }}</strong>)
+                <div style="font-weight: 900; font-size: larger;">
+                    Total: <strong>{{ totalCartValue | currency:'EUR':'symbol' }}</strong>
+                </div>
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary" (click)="refresh('atualizar')">
