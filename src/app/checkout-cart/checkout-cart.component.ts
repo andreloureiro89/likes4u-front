@@ -165,14 +165,9 @@ export class CheckoutCartComponent implements OnInit {
     return Array.isArray(o.comments) ? o.comments.filter(Boolean).length : 0;
   }
 
-  clearOrderList() {
-
-  }
-
-  private clampToStep50(n: number): number {
-    if (!Number.isFinite(n)) return 50;
-    const stepped = Math.round(n / 50) * 50;
-    return Math.max(50, stepped);
+  clenCheckOutCart() {
+    this.japService.deleteCart();
+    this.refresh('atualizar');
   }
 
   decQty() {

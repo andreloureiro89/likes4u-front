@@ -204,7 +204,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
   constructor(
     private verifyService: VerifyUrlService,
     private japService: JapService,
-    private pricing: PricingService
+    private pricing: PricingService,
+
   ) { }
 
   ngOnInit() {
@@ -336,11 +337,11 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     if (keyOrder) {
       this.japService.addItemToCart(keyOrder, payload).subscribe();
+      this.reset();
     } else {
       this.japService.addServiceOrderList(payload);
       this.reset();
     }
-
   }
 
   ensureCommentsArray() {

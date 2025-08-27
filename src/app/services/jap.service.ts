@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Order } from '../model/models/order';
 import { v4 as uuidv4 } from 'uuid';
+import { Router } from '@angular/router';
 
 const API = '/api';
 
@@ -18,7 +19,10 @@ export class JapService {
   private cartCountSubject = new BehaviorSubject<number>(0);
   cartCount$ = this.cartCountSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     const data = localStorage.getItem(this.storageKey);
     this.orderList = data ? JSON.parse(data) : [];
     this.cartCountSubject.next(this.orderList.length);
@@ -31,30 +35,39 @@ export class JapService {
         this.orderList = [...this.orderList, order];
         this.saveOrderKeyToStorage(cartId);
         this.cartCountSubject.next(this.orderList.length);
+        this.refreshComponent();
       },
       error: err => console.error('Falha ao enviar pedido para o backend', err)
     });
   }
 
+  refreshComponent() {
+    window.location.reload();
+  }
+
   getCart(cartId: string): void {
     this.http.get(`/api/cart/${cartId}`).subscribe({
       next: (res: any) => {
-        if (!res) {
+        console.log('RES');
+        
+        console.log(res);
+        console.log(res.orderList.length);
+        
+        
+        if (res.orderList.length == 0) {
           // carrinho inexistente → limpa tudo e zera badge
           this.orderList = [];
           this.removeOrderKeyLocalStorage();
-          this.cartCountSubject.next(0);
+          this.deleteCart();
           return;
         }
 
         this.orderList = res.orderList ?? [];
-        // (opcional) persistir para poderes mostrar no checkout sem novo fetch
-        localStorage.setItem(this.storageKey, JSON.stringify(this.orderList));
-
         // >>> isto é o que faltava: emitir para o badge
         this.cartCountSubject.next(this.orderList.length);
       },
       error: err => {
+        this.removeOrderKeyLocalStorage();
         console.error('Falha a obter cart', err);
         // em erro também não deixes o badge “preso”
         this.cartCountSubject.next(this.orderList.length || 0);
@@ -71,7 +84,7 @@ export class JapService {
   }
 
   getOrderKeyValue() {
-    this.cartId = localStorage.getItem("OrderIdLikes4u");
+    this.cartId = localStorage.getItem("OrderIdLikes4u");    
     return this.cartId;
   }
 
@@ -79,7 +92,6 @@ export class JapService {
     localStorage.removeItem('OrderIdLikes4u');
   }
 
-  // MÉTODO para adicionar um serviço a um cart existente
   addItemToCart(cartId: string, order: Order): Observable<{
     cartId: string; itemsCount: number; totalCart: number; orderAdded: Order;
   }> {
@@ -90,6 +102,7 @@ export class JapService {
         // opcional: sincronizar estado local e badge
         this.orderList.push(order);
         this.cartCountSubject.next(this.orderList.length);
+        this.refreshComponent();
       })
     );
   }
@@ -101,6 +114,18 @@ export class JapService {
         this.cartCountSubject.next(this.orderList.length);
       },
       error: err => console.error('Erro ao remover serviço', err)
+    });
+  }
+
+  deleteCart(): void {
+    this.http.delete(`/api/cart/${this.cartId}`).subscribe({
+      next: () => {
+        this.orderList = [];
+        this.cartCountSubject.next(0);
+        this.removeOrderKeyLocalStorage();
+        console.log('Carrinho apagado com sucesso');
+      },
+      error: err => console.error('Erro ao apagar carrinho', err)
     });
   }
 

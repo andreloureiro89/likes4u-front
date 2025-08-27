@@ -52,7 +52,6 @@
                     </ng-container>
 
                     <!-- modo edição -->
-                    <!-- modo edição -->
                     <ng-template #editFields>
                         <div class="row g-2 align-items-center">
                             <div class="col-12 col-md-8">
@@ -60,16 +59,15 @@
                                 <input type="url" class="form-control form-control-sm" [(ngModel)]="editModel.link" readonly>
                             </div>
 
-                            <div class="col-6 col-md-4">
-                                <label class="form-label small mb-1">Quantidade</label>
-                                <div class="input-group input-group-sm">
-                                    <button class="btn btn-outline-secondary" type="button" (click)="decQty()"
-                                        [disabled]="!editModel">−</button>
-                                    <input type="text" class="form-control text-center" [value]="editModel?.quantity"
-                                        readonly>
-                                    <button class="btn btn-outline-secondary" type="button" (click)="incQty()"
-                                        [disabled]="!editModel">+</button>
-                                </div>
+                            <!-- Quantidade: NÃO mostrar para comments premium -->
+                            <div class="col-6 col-md-4"
+                                *ngIf="editModel?.service !== 'comments' || editModel?.categoria !== '554'">
+                            <label class="form-label small mb-1">Quantidade</label>
+                            <div class="input-group input-group-sm">
+                                <button class="btn btn-outline-secondary" type="button" (click)="decQty()" [disabled]="!editModel">−</button>
+                                <input type="text" class="form-control text-center" [value]="editModel?.quantity" readonly>
+                                <button class="btn btn-outline-secondary" type="button" (click)="incQty()" [disabled]="!editModel">+</button>
+                            </div>
                             </div>
                         </div>
 
@@ -131,6 +129,9 @@
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary" (click)="refresh('atualizar')">
                     <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+                <button class="btn btn-danger" (click)="clenCheckOutCart()">
+                    <i class="bi bi-cart-x"></i> Esvaziar carrinho
                 </button>
                 <button class="btn btn-primary">
                     <i class="bi bi-credit-card-fill"></i> Finalizar compra
