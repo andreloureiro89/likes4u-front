@@ -47,13 +47,7 @@ export class JapService {
 
   getCart(cartId: string): void {
     this.http.get(`/api/cart/${cartId}`).subscribe({
-      next: (res: any) => {
-        console.log('RES');
-        
-        console.log(res);
-        console.log(res.orderList.length);
-        
-        
+      next: (res: any) => {        
         if (res.orderList.length == 0) {
           // carrinho inexistente → limpa tudo e zera badge
           this.orderList = [];
@@ -123,10 +117,22 @@ export class JapService {
         this.orderList = [];
         this.cartCountSubject.next(0);
         this.removeOrderKeyLocalStorage();
-        console.log('Carrinho apagado com sucesso');
       },
       error: err => console.error('Erro ao apagar carrinho', err)
     });
+  }
+
+  // Atualiza uma order dentro do carrinho
+  updateOrder(orderId: string, patch: Partial<Order>) {
+    return this.http.put<any>(`/api/cart/${this.cartId}/items/${orderId}`, patch)
+      .subscribe({
+        next: (res) => {
+          // sincroniza lista local e badge
+          this.orderList = res.cart.orderList;
+          this.cartCountSubject.next(this.orderList.length);
+        },
+        error: (err) => console.error('Erro ao atualizar serviço', err)
+      });
   }
 
 }

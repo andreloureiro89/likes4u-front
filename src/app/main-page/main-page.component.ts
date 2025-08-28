@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VerifyUrlService } from '../services/verify-url.service';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
@@ -424,7 +424,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  onQuantityChange(n: number) {
+ onQuantityChange(n: number) {
     const serviceId = Number(this.form.categoria);
     if (!serviceId) return;
 
@@ -446,7 +446,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     // calcula com margem e mínimo
     this.form.total = this.pricing.calculateEUR(serviceId, this.form.quantity);
   }
-
+  
   private resizeComments(n: number) {
     const prev = this.comments ?? [];
     const next = Array.from({ length: n }, (_, i) => prev[i] ?? '');

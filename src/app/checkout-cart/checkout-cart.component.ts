@@ -5,6 +5,7 @@ import { Order } from '../model/models/order';
 import { FormsModule } from '@angular/forms';
 import { ViewChild } from '@angular/core';
 import { ModalPopupComponent } from '../modal-popup/modal-popup.component';
+import { PricingService } from '../services/pricing.service';
 
 @Component({
   selector: 'app-checkout-cart',
@@ -23,7 +24,9 @@ export class CheckoutCartComponent implements OnInit {
   editModel: Partial<Order> = {};
   commentsText = '';
 
-  constructor(private japService: JapService) {
+  constructor(
+    private japService: JapService,
+    private pricingService: PricingService) {
   }
 
   ngOnInit(): void {
@@ -36,11 +39,8 @@ export class CheckoutCartComponent implements OnInit {
 
   refresh(from: string): void {
     if (from === "atualizar") {
-      this.orders = [];
-      setTimeout(() => {
         this.orders = this.japService.getOrderList();
         this.loading = false;
-      }, 2000);
     } else {
       this.orders = this.japService.getOrderList();
       this.loading = false;
@@ -98,14 +98,31 @@ export class CheckoutCartComponent implements OnInit {
         confirmText: 'Guardar',
         cancelText: 'Voltar'
       });
-      if (!ok) return;
+      if (ok) {
+        if (!this.editModel.id) return;
+        this.japService.updateOrder(this.editModel.id, this.editModel);
+      }
 
       this.editModel.comments = limpos;
+    } else {
+
+        const ok = await this.confirm.open({
+        title: 'Guardar alterações',
+        message: 'Confirmas as alterações deste item?',
+        confirmText: 'Guardar',
+        cancelText: 'Voltar'
+      });
+
+      if (ok) {
+        if (!this.editModel.id) return;
+        this.japService.updateOrder(this.editModel.id, this.editModel);
+      }
     }
-
-
-    this.cancelarEdicao();
-    this.refresh('atualizar');
+    
+    this.loading = true;
+    setTimeout(() => {
+      this.refresh('atualizar');
+    }, 2000);
   }
 
   async remove(order: Order) {
@@ -166,6 +183,7 @@ export class CheckoutCartComponent implements OnInit {
   }
 
   clenCheckOutCart() {
+    this.loading = true;
     this.japService.deleteCart();
     this.refresh('atualizar');
   }
@@ -173,25 +191,24 @@ export class CheckoutCartComponent implements OnInit {
   decQty() {
     if (!this.editModel) return;
 
-    if (this.editModel.service === 'comments') {
-      // de 2 em 2, mínimo 2
-      this.editModel.quantity = Math.max(2, (this.editModel.quantity || 2) - 2);
-    } else {
-      // de 50 em 50, mínimo 50
-      this.editModel.quantity = Math.max(50, (this.editModel.quantity || 50) - 50);
-    }
+    this.editModel.quantity = Math.max(1000, (this.editModel.quantity || 100) - 100);
+
+    let categoriaId = Number(this.editModel?.categoria);
+    if (!this.editModel.quantity) return;
+    let newValue = this.pricingService.calculateEUR(categoriaId, this.editModel.quantity);
+    this.editModel.total = newValue;
+    
   }
 
   incQty() {
     if (!this.editModel) return;
 
-    if (this.editModel.service === 'comments') {
-      // de 2 em 2, máximo 20
-      this.editModel.quantity = Math.min(20, (this.editModel.quantity || 2) + 2);
-    } else {
-      // de 50 em 50, máximo 5000
-      this.editModel.quantity = Math.min(5000, (this.editModel.quantity || 50) + 50);
-    }
+    this.editModel.quantity = Math.max(100, (this.editModel.quantity || 100) + 100);
+
+    let categoriaId = Number(this.editModel?.categoria);
+    if (!this.editModel.quantity) return;
+    let newValue = this.pricingService.calculateEUR(categoriaId, this.editModel.quantity);
+    this.editModel.total = newValue;
   }
 
   get commentsAsString(): string {

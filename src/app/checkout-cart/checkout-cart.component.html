@@ -72,7 +72,7 @@
                         </div>
 
                         <!-- AQUI: textarea só quando o serviço for 'comments' -->
-                        <div class="mt-2" *ngIf="editModel?.service === 'comments'">
+                        <div class="mt-2" *ngIf="editModel?.service === 'comments' && editModel?.categoria == '554'">
                             <label class="form-label small mb-1">Comentários (1 por linha)</label>
                             <textarea class="form-control form-control-sm" rows="6"
                                 [(ngModel)]="commentsAsString"></textarea>
