@@ -35,7 +35,8 @@
                 <!-- Lado esquerdo: info -->
                 <div class="text-start">
                     <div class="small text-muted mb-1">
-                        <strong>{{ serviceLabel(o.service) }}</strong> · {{ categoryLabel(o.categoria) }}  - {{ o.total | number:'1.2-2' }} €
+                        <strong>{{ serviceLabel(o.service) }}</strong> · {{ categoryLabel(o.categoria) }} - {{ o.total |
+                        number:'1.2-2' }} €
                     </div>
 
                     <!-- modo leitura -->
@@ -56,18 +57,22 @@
                         <div class="row g-2 align-items-center">
                             <div class="col-12 col-md-8">
                                 <label class="form-label small mb-1">Link</label>
-                                <input type="url" class="form-control form-control-sm" [(ngModel)]="editModel.link" readonly>
+                                <input type="url" class="form-control form-control-sm" [(ngModel)]="editModel.link"
+                                    readonly>
                             </div>
 
                             <!-- Quantidade: NÃO mostrar para comments premium -->
                             <div class="col-6 col-md-4"
                                 *ngIf="editModel?.service !== 'comments' || editModel?.categoria !== '554'">
-                            <label class="form-label small mb-1">Quantidade</label>
-                            <div class="input-group input-group-sm">
-                                <button class="btn btn-outline-secondary" type="button" (click)="decQty()" [disabled]="!editModel">−</button>
-                                <input type="text" class="form-control text-center" [value]="editModel?.quantity" readonly>
-                                <button class="btn btn-outline-secondary" type="button" (click)="incQty()" [disabled]="!editModel">+</button>
-                            </div>
+                                <label class="form-label small mb-1">Quantidade</label>
+                                <div class="input-group input-group-sm">
+                                    <button class="btn btn-outline-secondary" type="button" (click)="decQty()"
+                                        [disabled]="!editModel">−</button>
+                                    <input type="text" class="form-control text-center" [value]="editModel?.quantity"
+                                        readonly>
+                                    <button class="btn btn-outline-secondary" type="button" (click)="incQty()"
+                                        [disabled]="!editModel">+</button>
+                                </div>
                             </div>
                         </div>
 
@@ -78,7 +83,8 @@
                                 [(ngModel)]="commentsAsString"></textarea>
 
                             <div class="form-text" *ngIf="editModel?.categoria === '554'">
-                                Para a categoria PREMIUM nos comentários: mínimo 2 e máximo 20 (números pares). A lista deve ter a mesma
+                                Para a categoria PREMIUM nos comentários: mínimo 2 e máximo 20 (números pares). A lista
+                                deve ter a mesma
                                 quantidade escolhida.
                             </div>
                         </div>
@@ -128,16 +134,174 @@
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary" (click)="refresh('atualizar')">
-                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar carrinho
                 </button>
                 <button class="btn btn-danger" (click)="clenCheckOutCart()">
                     <i class="bi bi-cart-x"></i> Esvaziar carrinho
                 </button>
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" (click)="showPayments = !showPayments">
                     <i class="bi bi-credit-card-fill"></i> Finalizar compra
                 </button>
             </div>
         </div>
     </div>
+    <div class="mt-3" *ngIf="showPayments">
+        <div class="row g-2 text-center">
+
+            <!-- MB WAY -->
+            <div class="col-4">
+                <div class="card p-2 shadow-sm small text-center" (click)="selectPayment('mbway')"
+                    style="cursor:pointer">
+                    <i class="bi bi-credit-card-2-back-fill" style="font-size: xx-large;"></i>MB WAY
+                </div>
+            </div>
+
+            <!-- Multibanco -->
+            <div class="col-4">
+                <div class="card p-2 shadow-sm small" (click)="selectPayment('multibanco')" style="cursor:pointer">
+                    <i class="bi bi-credit-card-2-front" style="font-size: xx-large;"></i>Multibanco
+                </div>
+            </div>
+
+            <!-- Cartão -->
+            <div class="col-4">
+                <div class="card p-2 shadow-sm small" (click)="selectPayment('card')" style="cursor:pointer">
+                    <i class="bi bi-person-vcard" style="font-size: xx-large;"></i>Cartão de Credito
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form *ngIf="selectedPayment === 'mbway'" (ngSubmit)="confirmMbWay()" #mbForm="ngForm" novalidate class="row g-3">
+
+        <!-- Número de telemóvel -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Telemóvel (MB WAY)</label>
+            <input type="tel" name="phone" class="form-control" [(ngModel)]="mbw.phone" required pattern="^9\d{8}$"
+                inputmode="numeric" placeholder="9XXXXXXXX" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <div class="invalid-feedback d-block" *ngIf="mbForm.submitted && !mbForm.controls['phone']?.valid">
+                Introduz um nº válido (tem de começar por 9 e ter exatamente 9 dígitos).
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="mbBusy || !mbForm.valid">
+                <span *ngIf="mbBusy" class="spinner-border spinner-border-sm me-1"></span>
+                Confirmar pedido – {{ totalCartValue | currency:'EUR':'symbol' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelPayment()">Cancelar</button>
+        </div>
+    </form>
+
+    <!-- MULTIBANCO -->
+    <form *ngIf="selectedPayment === 'multibanco'" (ngSubmit)="confirmMultibanco()" #mbRefForm="ngForm" novalidate
+        class="row g-3">
+
+        <!-- Nome (opcional) -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Nome (opcional)</label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="mbRef.name" maxlength="120"
+                placeholder="Nome do Cliente">
+        </div>
+
+        <!-- NIF (opcional) -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">NIF (opcional)</label>
+            <input type="text" name="nif" class="form-control" [(ngModel)]="mbRef.nif" pattern="^[1235689]\d{8}$"
+                inputmode="numeric" placeholder="9 dígitos (se aplicável)">
+            <div class="invalid-feedback d-block" *ngIf="mbRefForm.submitted && mbRefForm.controls['nif']?.invalid">
+                NIF inválido (9 dígitos, começa por 1,2,3,5,6,8 ou 9).
+            </div>
+        </div>
+
+        <!-- Email (obrigatório) -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Email</label>
+            <input type="email" name="email" class="form-control" [(ngModel)]="mbRef.email" required
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="exemplo@dominio.com">
+            <div class="invalid-feedback d-block" *ngIf="mbRefForm.submitted && mbRefForm.controls['email']?.invalid">
+                Email inválido.
+            </div>
+        </div>
+
+        <!-- Valor -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Valor</label>
+            <input class="form-control" [value]="totalCartValue | currency:'EUR':'symbol'" readonly>
+        </div>
+
+        <!-- Botões -->
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="mbRefBusy || !mbRefForm.valid">
+                <span *ngIf="mbRefBusy" class="spinner-border spinner-border-sm me-1"></span>
+                Gerar referência – {{ totalCartValue | currency:'EUR':'symbol' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelPayment()">Cancelar</button>
+        </div>
+    </form>
+
+    <!-- CARTÃO DE CRÉDITO -->
+    <form *ngIf="selectedPayment === 'card'" (ngSubmit)="confirmCard()" #ccForm="ngForm" novalidate class="row g-3">
+
+        <!-- Nome no cartão -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Nome no cartão</label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="cc.name" required>
+            <div class="invalid-feedback d-block" *ngIf="ccForm.submitted && !ccForm.controls['name']?.valid">
+                Introduz o nome do cartão.
+            </div>
+        </div>
+
+        <!-- Número do cartão -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Número do cartão</label>
+            <input type="text" name="number" class="form-control" [(ngModel)]="cc.number" required
+                pattern="^[0-9]{13,19}$" inputmode="numeric" placeholder="1234 5678 9012 3456">
+            <div class="invalid-feedback d-block" *ngIf="ccForm.submitted && !ccForm.controls['number']?.valid">
+                Introduz um número de cartão válido (13 a 19 dígitos).
+            </div>
+        </div>
+
+        <!-- Validade -->
+        <div class="col-6 col-md-3">
+            <label class="form-label small">Validade (MM/AA)</label>
+            <input type="text" name="exp" class="form-control" [(ngModel)]="cc.exp" required
+                pattern="^(0[1-9]|1[0-2])\/\d{2}$" placeholder="MM/AA">
+            <div class="invalid-feedback d-block" *ngIf="ccForm.submitted && !ccForm.controls['exp']?.valid">
+                Introduz validade no formato MM/AA.
+            </div>
+        </div>
+
+        <!-- CVC -->
+        <div class="col-6 col-md-3">
+            <label class="form-label small">CVC</label>
+            <input type="text" name="cvc" class="form-control" [(ngModel)]="cc.cvc" required pattern="^[0-9]{3,4}$"
+                inputmode="numeric" placeholder="123">
+            <div class="invalid-feedback d-block" *ngIf="ccForm.submitted && !ccForm.controls['cvc']?.valid">
+                Introduz o código de 3 ou 4 dígitos.
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="col-12 col-md-6">
+            <label class="form-label small">Email</label>
+            <input type="email" name="email" class="form-control" [(ngModel)]="cc.email" required
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="exemplo@email.com">
+            <div class="invalid-feedback d-block" *ngIf="ccForm.submitted && !ccForm.controls['email']?.valid">
+                Introduz um email válido.
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="ccBusy || !ccForm.valid">
+                <span *ngIf="ccBusy" class="spinner-border spinner-border-sm me-1"></span>
+                Confirmar pedido – {{ totalCartValue | currency:'EUR':'symbol' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelPayment()">Cancelar</button>
+        </div>
+    </form>
+
 </div>
 <app-modal-popup #confirm></app-modal-popup>

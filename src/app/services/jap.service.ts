@@ -28,6 +28,10 @@ export class JapService {
     this.cartCountSubject.next(this.orderList.length);
   }
 
+  getCardId(){
+    return this.cartId;
+  }
+
   addServiceOrderList(order: Order): void {
     const cartId = 'c_' + uuidv4();
     this.http.post('/api/cart', { cartId, order }).subscribe({

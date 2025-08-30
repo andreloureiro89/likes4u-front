@@ -20,9 +20,27 @@ export class CheckoutCartComponent implements OnInit {
 
   orders: Order[] = [];
   loading = true;
+  showPayments = false;
   editingId: string | null = null;
   editModel: Partial<Order> = {};
   commentsText = '';
+  selectedPayment = '';
+
+
+  mbw = { phone: '' };
+  mbBusy = false;
+  mbRefBusy = false;
+  mbRef = { name: '', nif: '', email: '', description: '' };
+
+  cc = {
+  name: '',
+  number: '',
+  exp: '',
+  cvc: '',
+  email: ''
+};
+
+ccBusy = false;
 
   constructor(
     private japService: JapService,
@@ -30,17 +48,15 @@ export class CheckoutCartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // busca os itens atuais do carrinho
     this.refresh('');
-
   }
 
   trackById = (_: number, o: Order) => o.id;
 
   refresh(from: string): void {
     if (from === "atualizar") {
-        this.orders = this.japService.getOrderList();
-        this.loading = false;
+      this.orders = this.japService.getOrderList();
+      this.loading = false;
     } else {
       this.orders = this.japService.getOrderList();
       this.loading = false;
@@ -106,7 +122,7 @@ export class CheckoutCartComponent implements OnInit {
       this.editModel.comments = limpos;
     } else {
 
-        const ok = await this.confirm.open({
+      const ok = await this.confirm.open({
         title: 'Guardar alterações',
         message: 'Confirmas as alterações deste item?',
         confirmText: 'Guardar',
@@ -118,10 +134,11 @@ export class CheckoutCartComponent implements OnInit {
         this.japService.updateOrder(this.editModel.id, this.editModel);
       }
     }
-    
+
     this.loading = true;
     setTimeout(() => {
       this.refresh('atualizar');
+      this.cancelarEdicao();
     }, 2000);
   }
 
@@ -197,7 +214,7 @@ export class CheckoutCartComponent implements OnInit {
     if (!this.editModel.quantity) return;
     let newValue = this.pricingService.calculateEUR(categoriaId, this.editModel.quantity);
     this.editModel.total = newValue;
-    
+
   }
 
   incQty() {
@@ -221,6 +238,50 @@ export class CheckoutCartComponent implements OnInit {
       .split('\n')
       .map(s => s.trim())
       .filter(Boolean);
+  }
+
+  selectPayment(method: string) {
+    this.selectedPayment = method;
+  }
+
+  confirmMbWay() {
+    this.mbBusy = true;
+
+    console.log('Pagar com MB WAY:', this.mbw.phone);
+
+    // TODO: aqui fazes a chamada ao backend IfThenPay
+    setTimeout(() => {
+      this.mbBusy = false;
+    }, 2000);
+  }
+
+  confirmMultibanco() {
+    this.mbRefBusy = true;
+    console.log(this.mbRef);
+    // TODO: aqui fazes a chamada ao backend IfThenPay
+    setTimeout(() => {
+      this.mbRefBusy = false;
+    }, 2000);
+    
+  }
+
+confirmCard() {
+  if (!this.cc.number || !this.cc.exp || !this.cc.cvc || !this.cc.name) {
+    return;
+  }
+
+  this.ccBusy = true;
+  console.log("Pagamento com cartão:", this.cc);
+
+  // TODO: chamada ao backend / IfThenPay / processador
+  setTimeout(() => {
+    this.ccBusy = false;
+  }, 2000);
+}
+  
+
+  cancelPayment() {
+    this.mbw.phone = '';
   }
 
 }
